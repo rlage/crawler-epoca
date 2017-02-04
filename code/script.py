@@ -14,7 +14,16 @@ and they lived at the bottom of a well.</p>
 
 <p class="story">...</p>
 """
-
+import re
+import mechanize
 from bs4 import BeautifulSoup
 soup = BeautifulSoup(html_doc, 'html.parser')
-print soup
+print soup.title
+
+
+br = mechanize.Browser()
+br.open("http://www.epocacosmeticos.com.br/")
+# follow second link with element text matching regular expression
+#response1 = br.follow_link(text_regex=r"cheese\s*shop", nr=1)
+assert br.viewing_html()
+print br.title()
