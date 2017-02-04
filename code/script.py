@@ -1,0 +1,1 @@
+#Arquivo de script com o código do crawler
