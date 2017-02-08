@@ -27,3 +27,11 @@ br.open("http://www.epocacosmeticos.com.br/")
 #response1 = br.follow_link(text_regex=r"cheese\s*shop", nr=1)
 assert br.viewing_html()
 print br.title()
+
+def retrieveAllUrls(a):
+	""" Recebe uma URL e retorna todas as URLs de produtos """
+	if (a == 1):
+		return True
+	else:
+		return False
+
