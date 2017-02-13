@@ -1,37 +1,46 @@
 #coding: utf-8
 #Arquivo de script com o código do crawler
 
-html_doc = """
-<html><head><title>The Dormouse's story</title></head>
-<body>
-<p class="title"><b>The Dormouse's story</b></p>
-
-<p class="story">Once upon a time there were three little sisters; and their names were
-<a href="http://example.com/elsie" class="sister" id="link1">Elsie</a>,
-<a href="http://example.com/lacie" class="sister" id="link2">Lacie</a> and
-<a href="http://example.com/tillie" class="sister" id="link3">Tillie</a>;
-and they lived at the bottom of a well.</p>
-
-<p class="story">...</p>
-"""
 import re
 import mechanize
 from bs4 import BeautifulSoup
-soup = BeautifulSoup(html_doc, 'html.parser')
-print soup.title
+
+class Product:
+  def __init__(self, name, title, url):
+    self.name = name
+    self.title = title
+    self.url = url
+
+def retrieveAllCategoryUrls(url):
+  """
+  Essa função recebe a url principal de um site
+  e retorna a lista de URLs das categorias
+  """
+  all_urls = []
+  for link in all_menu_items:
+      css_class = link.parent.get('class')[1]
+      if ( css_class != 'm_marcas') and (css_class != 'solares'):
+          all_urls.append(link.get('href'))       
+  return all_urls
+
+def retrieveProductsInformation(url):
+  """
+  Essa função recebe a url de uma categoria e retorna 
+  a lista de objetos produto contendo os dados
+  de cada produto
+  """
+  product = Product("nome", "titulo", "url")
+  return (product.name, product.title, product.url)
 
 
+
+
+url = 'http://www.epocacosmeticos.com.br/'
 br = mechanize.Browser()
-br.open("http://www.epocacosmeticos.com.br/")
-# follow second link with element text matching regular expression
-#response1 = br.follow_link(text_regex=r"cheese\s*shop", nr=1)
-assert br.viewing_html()
-print br.title()
+html_doc = br.open(url)
+soup = BeautifulSoup(html_doc, 'html.parser')
+all_menu_items = soup.find_all("a", class_="princ")
+all_category_urls = retrieveAllCategoryUrls(url)
 
-def retrieveAllUrls(a):
-	""" Recebe uma URL e retorna todas as URLs de produtos """
-	if (a == 1):
-		return True
-	else:
-		return False
+print retrieveProductsInformation(all_category_urls[0])
 
