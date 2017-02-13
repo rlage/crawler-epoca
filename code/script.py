@@ -3,6 +3,7 @@
 
 import re
 import mechanize
+import csv
 from bs4 import BeautifulSoup
 
 class Product:
@@ -16,31 +17,70 @@ def retrieveAllCategoryUrls(url):
   Essa função recebe a url principal de um site
   e retorna a lista de URLs das categorias
   """
-  all_urls = []
-  for link in all_menu_items:
+  html_doc = br.open(url)
+  soup = BeautifulSoup(html_doc, 'html.parser')
+  menu_items = soup.find_all("a", class_="princ")
+  urls = []
+  for link in menu_items:
       css_class = link.parent.get('class')[1]
       if ( css_class != 'm_marcas') and (css_class != 'solares'):
-          all_urls.append(link.get('href'))       
-  return all_urls
+          urls.append(link.get('href'))       
+  return urls
 
-def retrieveProductsInformation(url):
+def retrieveProductsFromCategory(url):
   """
   Essa função recebe a url de uma categoria e retorna 
   a lista de objetos produto contendo os dados
-  de cada produto
+  de cada produto daquela categoria
   """
-  product = Product("nome", "titulo", "url")
-  return (product.name, product.title, product.url)
+  print url
+  html_doc = br.open(url)
 
+  soup = BeautifulSoup(html_doc, 'html.parser')
+  items = soup.find_all("a", class_="productImage")
+  products = []
 
+  for item in items:
+    name = item.parent.get('value')
+    title = item.get('title')
+    url = item.get('href')
+    product = Product(name, title, url)
+    products.append(product)
+  return (products)
 
+def retrieveProducts(category_urls):
+  """
+  Recebe um array com as urls de todas as categorias
+  e retorna um array com todos os produtos de todas as categorias
+  """
+  products = []
+  
+  for url in category_urls:
+    products += retrieveProductsFromCategory(url)
+
+  return products
+
+def writeInformationToCsv(products):
+  """
+  Recebe um array de produtos e escreve
+  nome, titulo e url em um csv
+  """
+  f = open('products.csv', 'w')
+
+  for product in products:
+    f.write(
+      product.name.encode("utf-8") + "," + 
+      product.title.encode("utf-8") + "," + 
+      product.url.encode("utf-8") + "\n")
+
+  f.close()
+  print "Arquivo products.csv escrito com sucesso."
 
 url = 'http://www.epocacosmeticos.com.br/'
 br = mechanize.Browser()
-html_doc = br.open(url)
-soup = BeautifulSoup(html_doc, 'html.parser')
-all_menu_items = soup.find_all("a", class_="princ")
-all_category_urls = retrieveAllCategoryUrls(url)
+category_urls = retrieveAllCategoryUrls(url)
+products = retrieveProducts(category_urls)
+writeInformationToCsv(products)
 
-print retrieveProductsInformation(all_category_urls[0])
+
 
