@@ -17,15 +17,23 @@ def retrieveAllCategoryUrls(url):
   Essa função recebe a url principal de um site
   e retorna a lista de URLs das categorias
   """
-  html_doc = br.open(url)
-  soup = BeautifulSoup(html_doc, 'html.parser')
-  menu_items = soup.find_all("a", class_="princ")
-  urls = []
-  for link in menu_items:
-      css_class = link.parent.get('class')[1]
-      if ( css_class != 'm_marcas') and (css_class != 'solares'):
-          urls.append(link.get('href'))       
-  return urls
+  try:
+    
+    html_doc = br.open(url)
+  
+    soup = BeautifulSoup(html_doc, 'html.parser')
+    menu_items = soup.find_all("a", class_="princ")
+    urls = []
+    for link in menu_items:
+        css_class = link.parent.get('class')[1]
+        if ( css_class != 'm_marcas') and (css_class != 'solares'):
+            urls.append(link.get('href'))       
+    return urls
+
+  except TypeError as (e):
+    print "Type error({0})".format(e)
+  except Exception as (e):
+    print "Unexpected error({0})".format(e)
 
 def retrieveProductsFromCategory(url):
   """
